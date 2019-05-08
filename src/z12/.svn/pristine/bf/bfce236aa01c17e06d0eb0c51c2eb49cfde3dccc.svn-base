@@ -1,0 +1,82 @@
+package z12.Produkcja;
+
+import javax.swing.*;
+import java.awt.*;
+import java.text.SimpleDateFormat;
+
+public class Zamowienie {
+
+    private int nrZamowienia;
+    private int wartoscZamowienia;
+    private String dataZamowienia;
+    private static int iloscZamowien;
+    private boolean zamowienieGotowe;
+    private Faktura faktura;
+    private Platnosci platnosc;
+
+    public Zamowienie(int wartoscZamowienia)
+    {
+        this.wartoscZamowienia = wartoscZamowienia;
+        nrZamowienia = ++iloscZamowien;
+        //var dateFormat = new SimpleDateFormat ("yyyy.MM.dd");
+       // dataZamowienia = dateFormat.format(dataZamowienia);
+        zamowienieGotowe = false;
+        var rodzajPlatnosci = wybierzRodzajPlatnosci();
+        faktura = new Faktura(wartoscZamowienia, rodzajPlatnosci, dataZamowienia);
+        platnosc = new Platnosci(wartoscZamowienia/5);
+        System.out.println(rodzajPlatnosci);
+    }
+
+    public boolean isZamowienieGotowe() {
+        return zamowienieGotowe;
+    }
+
+    private String wybierzRodzajPlatnosci()
+    {
+        final String[] result = new String[1];
+        var rodzajPlatnosciWindow = new JFrame("Rodzaj Platnosci");
+        rodzajPlatnosciWindow.getContentPane().add(new JLabel("Prosze wybrac rodzaj platnosci"), SwingConstants.CENTER);
+
+        ButtonGroup btnGrp = new ButtonGroup();
+
+        JRadioButton rbtnPrzelew = new JRadioButton("Przelew");
+        JRadioButton rbtnGotowka = new JRadioButton("Gotowka");
+        JRadioButton rbtnKarta = new JRadioButton("Karta");
+        btnGrp.add(rbtnPrzelew);
+        btnGrp.add(rbtnGotowka);
+        btnGrp.add(rbtnKarta);
+
+        JButton btnAccept = new JButton("Potwierdz");
+
+        rodzajPlatnosciWindow.getContentPane().add(rbtnPrzelew);
+        rodzajPlatnosciWindow.getContentPane().add(rbtnGotowka);
+        rodzajPlatnosciWindow.getContentPane().add(rbtnKarta);
+        rodzajPlatnosciWindow.getContentPane().add(btnAccept);
+
+        //Przycisk do potwierdzenia platnosci, zamyka narazie okno
+        //trzeba dodac opcje zeby wyslac na serwer ktora opcje sie zaznaczylo
+        btnAccept.addActionListener(e -> {
+            rodzajPlatnosciWindow.dispose();
+        });
+
+        rodzajPlatnosciWindow.setSize(500, 500);
+        rodzajPlatnosciWindow.setLayout(new GridLayout(15,1));
+        rodzajPlatnosciWindow.setVisible(true);
+
+        //zawsze pokazuje null
+        if(rbtnPrzelew.isSelected()){
+            result[0] = "Przelew";
+        }else if(rbtnGotowka.isSelected()){
+            result[0] =  "Gotowka";
+        }else if(rbtnKarta.isSelected()){
+            result[0] =  "Karta";
+        }
+
+        return result[0];
+    }
+
+    private void ukonczZamowienie()
+    {
+        zamowienieGotowe = true;
+    }
+}

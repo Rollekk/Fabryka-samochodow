@@ -1,0 +1,35 @@
+package z12.Osoby;
+
+
+
+public class PracownikProdukcji extends Pracownik {
+
+
+    public PracownikProdukcji(int idPracownika, float pensjaPracownika, String dzialPracownika) {
+        super(idPracownika, pensjaPracownika, dzialPracownika);
+    }
+
+
+    private int zglosEtap()
+    {
+    return 1;
+    }
+
+    private int zglosBrak()
+    {
+    return 1;
+    }
+
+    private boolean produkujSamochod()
+    {
+        return false;
+
+    }
+
+    private boolean naprawReklamacje()
+    {
+        return false;
+    }
+
+
+}

@@ -1,0 +1,40 @@
+package z12.Produkcja;
+
+import java.text.SimpleDateFormat;
+
+public class Zamowienie {
+
+    private int nrZamowienia;
+    private int wartoscZamowienia;
+    private String dataZamowienia;
+    private static int iloscZamowien;
+    private boolean zamowienieGotowe;
+    private Faktura faktura;
+    private Platnosci platnosc;
+
+    public Zamowienie(int wartoscZamowienia)
+    {
+        this.wartoscZamowienia = wartoscZamowienia;
+        nrZamowienia = ++iloscZamowien;
+        var dateFormat = new SimpleDateFormat ("yyyy.MM.dd");
+        dataZamowienia = dateFormat.format(dataZamowienia);
+        zamowienieGotowe = false;
+        var rodzajPlatnosci = wybierzRodzajPlatnosci();
+        faktura = new Faktura(wartoscZamowienia, rodzajPlatnosci, dataZamowienia);
+        platnosc = new Platnosci(wartoscZamowienia/5);
+    }
+
+    public boolean isZamowienieGotowe() {
+        return zamowienieGotowe;
+    }
+
+    public String wybierzRodzajPlatnosci()
+    {
+        return "przelew bankowy";
+    }
+
+    private void ukonczZamowienie()
+    {
+        zamowienieGotowe = true;
+    }
+}

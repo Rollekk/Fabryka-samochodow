@@ -1,0 +1,17 @@
+package z12.Produkcja;
+
+import java.util.Date;
+
+public class Faktura {
+
+private int idFaktury;
+private Date data;
+private double cena;
+private String rodzajPlatnosci;
+private int numerKonta;
+
+private int liczCene()
+{
+return 1;
+}
+}

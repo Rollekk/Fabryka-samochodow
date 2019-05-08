@@ -1,0 +1,254 @@
+package z12;
+
+import z12.Client.LoginDialog;
+import z12.Pracownik.LoginDialogP;
+
+import java.awt.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import javax.imageio.ImageIO;
+
+import java.util.Date;
+import java.util.Scanner;
+import java.util.concurrent.atomic.AtomicReference;
+import javax.swing.*;
+
+public class Main {
+    private static String nazwaKlienta = null;
+    private static String nazwaPracownika = null;
+    private static String received;
+    public static void main(String[] args) throws Exception{
+        var socket = new Socket("localhost", 9899);
+        var in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+        var out = new PrintWriter(socket.getOutputStream(), true);
+
+
+      Date date = new Date();
+       SimpleDateFormat ft = new SimpleDateFormat ("yyyy.MM.dd ");
+
+       final JFrame frame = new JFrame("System zarządzania fabryką samochodów");
+
+        final JLabel lbInformation = new JLabel("Projekt - Podstawy Inżynierii Programowania") ;
+        final JLabel lbInformation2 = new JLabel("Kornaś, Kowalczyk, Krakowiak, Kowalewski") ;
+
+        final JLabel infoKlient = new JLabel("LOGOWANIE DLA KLIENTA:", SwingConstants.CENTER) ;
+        final JButton btnLoginK = new JButton("Kliknij aby zalogować");
+        final JButton btnLogoutK = new JButton("Kliknij aby wylogowac");
+
+        final JLabel infoPracownik = new JLabel("LOGOWANIE DLA PRACOWNIKA:", SwingConstants.CENTER) ;
+        final JButton btnLoginP = new JButton("Kliknij aby zalogować");
+        final JButton btnLogoutP = new JButton("Kliknij aby wylogowac");
+
+        final JButton btnNowaOferta= new JButton("Przegladaj oferte");
+        final JButton btnEdytujOferta= new JButton("Edytuj oferty");
+
+        final JLabel data = new JLabel("Czas uruchomienia: " + Data.getDate()) ;
+
+        btnLogoutK.setEnabled(false);
+        btnLogoutP.setEnabled(false);
+        btnNowaOferta.setEnabled(false);
+        btnEdytujOferta.setEnabled(false);
+        //Klient
+        btnLogoutK.addActionListener(
+                e -> {
+                        btnLoginK.setText("Kliknij aby zalogować");
+                        btnLoginK.setEnabled(true);
+                        btnLogoutK.setEnabled(false);
+                        btnLoginP.setEnabled(true);
+                        btnNowaOferta.setEnabled(false);
+                    System.out.println("Wylogowano klienta: " + nazwaKlienta);
+
+                });
+        btnLoginK.addActionListener(
+                e -> {
+                    LoginDialog loginDlg = new LoginDialog(frame);
+                    loginDlg.setVisible(true);
+
+                    if(loginDlg.isSucceeded()){
+                        nazwaKlienta = loginDlg.getUsername();
+                        btnLoginK.setText("Witaj " + nazwaKlienta  + "!");
+                        System.out.println("Zalogowano "+  nazwaKlienta);
+                        btnLoginK.setEnabled(false);
+                        btnLogoutK.setEnabled(true);
+                        btnLoginP.setEnabled(false);
+                        btnNowaOferta.setEnabled(true);
+                    }
+                });
+        //Pracownik
+        btnLogoutP.addActionListener(
+                e -> {
+                    btnLoginP.setText("Kliknij aby zalogować");
+                    btnLoginP.setEnabled(true);
+                    btnLogoutP.setEnabled(false);
+                    btnLoginK.setEnabled(true);
+                    btnEdytujOferta.setEnabled(false);
+                    System.out.println("Wylogowano pracownika: "+ nazwaPracownika);
+
+                });
+        btnLoginP.addActionListener(
+                e -> {
+                    LoginDialogP loginDlgP = new LoginDialogP(frame);
+                    loginDlgP.setVisible(true);
+
+                    if(loginDlgP.isSucceeded()){
+                        nazwaPracownika = loginDlgP.getUsername();
+                        btnLoginP.setText("Witaj " + nazwaPracownika  + "!");
+                        System.out.println("Zalogowano na pracownika: "+  nazwaPracownika);
+                        btnLoginP.setEnabled(false);
+                        btnLogoutP.setEnabled(true);
+                        btnLoginK.setEnabled(false);
+                        btnEdytujOferta.setEnabled(true);
+                    }
+                });
+
+        //Przegladaj oferte
+        btnNowaOferta.addActionListener(e -> {
+            final JButton btnPrev= new JButton("Poprzedni");
+            final JLabel labinformacja= new JLabel("Aktualny samochod: BRAK");
+
+            var path = "http://www.bhmpics.com/wallpapers/bmw_m2_coupe_m_performance_parts_2016-1366x768.jpg";
+            URL url;
+            BufferedImage image = null;
+            try {
+                url = new URL(path);
+                image = ImageIO.read(url);
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            image = Support.createResizedCopy(image, 480, 270);
+            var imgLabel = new JLabel(new ImageIcon(image));
+            var newOfertaWindow = new JFrame("Aktualna oferta");
+
+            newOfertaWindow.add(new JLabel("OFERTA AKTUALNA NA DZIEN: "));
+
+            newOfertaWindow.pack();
+            newOfertaWindow.setVisible(true);
+
+              try {
+                   System.out.println(in.readLine());
+                 } catch (IOException e1) {
+                     e1.printStackTrace();
+              }
+
+            final JButton btnNext = new JButton("Następny");
+
+              btnNext.addActionListener(f -> {
+
+             out.println("nextgen");
+             try {
+                 received =  in.readLine();
+
+             } catch (IOException e1) {
+                 e1.printStackTrace();
+             }
+             labinformacja.setText(received);
+             System.out.println(received);
+
+
+            });
+
+newOfertaWindow.add(new JLabel(ft.format(date)));
+newOfertaWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+newOfertaWindow.setSize(800, 500);
+newOfertaWindow.setLayout(new GridLayout(5,5));
+newOfertaWindow.setAlwaysOnTop(true);
+
+newOfertaWindow.getContentPane().add(btnNext);
+newOfertaWindow.getContentPane().add(btnPrev);
+newOfertaWindow.getContentPane().add(labinformacja);
+
+            newOfertaWindow.getContentPane().add(imgLabel);
+
+newOfertaWindow.pack();
+});
+        //Edytuj Oferty
+        btnEdytujOferta.addActionListener(e -> {
+
+            JFrame editOfertaWindow = new JFrame("Oferty");
+            JRadioButton btnOferta1 = new JRadioButton(("Oferta #1"));
+            JRadioButton btnOferta2 = new JRadioButton(("Oferta #2"));
+            JRadioButton btnOferta3 = new JRadioButton(("Oferta #3"));
+            JRadioButton btnOferta4 = new JRadioButton(("Oferta #4"));
+            final JButton btnDalej= new JButton("Dalej");
+            editOfertaWindow.setVisible(true);
+
+            try {
+                System.out.println(in.readLine());
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+
+            //Otworzenie nowegoa okna z edycja ofert
+            editOfertaWindow.add(new JLabel("OFERTY "));
+            editOfertaWindow.add(new JLabel("NA DZIEN: " + ft.format(date), SwingConstants.CENTER));
+            ButtonGroup radioButtonGroup = new ButtonGroup();
+
+            radioButtonGroup.add(btnOferta1);
+            radioButtonGroup.add(btnOferta2);
+            radioButtonGroup.add(btnOferta3);
+            radioButtonGroup.add(btnOferta4);
+
+            editOfertaWindow.add(btnOferta1);
+            editOfertaWindow.add(btnOferta2);
+            editOfertaWindow.add(btnOferta3);
+            editOfertaWindow.add(btnOferta4);
+            editOfertaWindow.add(btnDalej);
+
+            editOfertaWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+            editOfertaWindow.setSize(800, 600);
+            editOfertaWindow.setLayout(new GridLayout(5,2));
+
+            //Po zaznaczeniu oferty wyswietlaja sie opcje
+
+                  btnDalej.addActionListener(f -> {
+
+                      JButton btnExit = new JButton("Wyjdz");
+                      editOfertaWindow.getContentPane().removeAll();
+                      editOfertaWindow.repaint();
+                      editOfertaWindow.setVisible(true);
+                      editOfertaWindow.add(new JLabel("Wybrano Oferte..."), SwingConstants.CENTER);
+                      editOfertaWindow.add(new JLabel("Dane oferty:"));
+                      editOfertaWindow.add(btnExit);
+                      editOfertaWindow.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                      editOfertaWindow.setSize(400, 300);
+                      editOfertaWindow.setLayout(new GridLayout(3, 1));
+
+                      btnExit.addActionListener(g -> {
+                          editOfertaWindow.dispose();
+                      });
+                  });
+
+            editOfertaWindow.pack();
+        });
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(500, 500);
+        frame.setLayout(new GridLayout(15,1));
+        frame.getContentPane().add(lbInformation);
+        frame.getContentPane().add(lbInformation2);
+
+        frame.getContentPane().add(infoKlient);
+        frame.getContentPane().add(btnLoginK);
+        frame.getContentPane().add(btnNowaOferta);
+        frame.getContentPane().add(btnLogoutK);
+
+        frame.getContentPane().add(infoPracownik);
+        frame.getContentPane().add(btnLoginP);
+        frame.getContentPane().add(btnEdytujOferta);
+        frame.getContentPane().add(btnLogoutP);
+
+        frame.getContentPane().add(data);
+
+        frame.setResizable(false);
+        frame.setVisible(true);
+    }
+}

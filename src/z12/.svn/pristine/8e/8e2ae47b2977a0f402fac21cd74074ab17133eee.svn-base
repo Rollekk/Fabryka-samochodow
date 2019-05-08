@@ -1,0 +1,27 @@
+package z12.Osoby;
+
+public class Klient extends Osoba {
+
+    private int idKlienta;
+    private int numerInformacjiPodatkowej;
+
+    public Klient(int idKlienta, int numerInformacjiPodatkowej) {
+    super();
+        this.idKlienta = idKlienta;
+        this.numerInformacjiPodatkowej = numerInformacjiPodatkowej;
+    }
+
+    void przegladajOferte(int idOferty) {
+
+    }
+
+    int zlozZamowienie() {
+
+        return 1;
+    }
+
+    boolean personalizujOferte(int idZamowienia) {
+
+        return true;
+    }
+}

@@ -1,0 +1,95 @@
+package z12.Produkcja;
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.text.SimpleDateFormat;
+
+public class Zamowienie {
+
+    private int nrZamowienia;
+    private int wartoscZamowienia;
+    private String dataZamowienia;
+    private static int iloscZamowien;
+    private boolean zamowienieGotowe;
+    private Faktura faktura;
+    private Platnosci platnosc;
+
+    public Zamowienie(int wartoscZamowienia) throws IOException {
+        this.wartoscZamowienia = wartoscZamowienia;
+        nrZamowienia = ++iloscZamowien;
+        //var dateFormat = new SimpleDateFormat ("yyyy.MM.dd");
+       // dataZamowienia = dateFormat.format(dataZamowienia);
+        zamowienieGotowe = false;
+        var rodzajPlatnosci = wybierzRodzajPlatnosci();
+        faktura = new Faktura(wartoscZamowienia, rodzajPlatnosci, dataZamowienia);
+        platnosc = new Platnosci(wartoscZamowienia/5);
+        System.out.println(rodzajPlatnosci);
+    }
+
+    public boolean isZamowienieGotowe(boolean czy) {
+        return czy;
+    }
+
+    private String wybierzRodzajPlatnosci() throws IOException {
+        var socket = new Socket("localhost", 9899);
+        var out = new PrintWriter(socket.getOutputStream(), true);
+
+        final String[] result = new String[1];
+        var rodzajPlatnosciWindow = new JFrame("Rodzaj Platnosci");
+        rodzajPlatnosciWindow.getContentPane().add(new JLabel("Prosze wybrac rodzaj platnosci"), SwingConstants.CENTER);
+
+        ButtonGroup btnGrp = new ButtonGroup();
+
+        JRadioButtonMenuItem rbtnPrzelew = new JRadioButtonMenuItem("Przelew");
+        JRadioButtonMenuItem rbtnGotowka = new JRadioButtonMenuItem("Gotowka");
+        JRadioButtonMenuItem rbtnKarta = new JRadioButtonMenuItem("Karta");
+        btnGrp.add(rbtnPrzelew);
+        btnGrp.add(rbtnGotowka);
+        btnGrp.add(rbtnKarta);
+
+        JButton btnAccept = new JButton("Potwierdz");
+
+        rodzajPlatnosciWindow.getContentPane().add(rbtnPrzelew);
+        rodzajPlatnosciWindow.getContentPane().add(rbtnGotowka);
+        rodzajPlatnosciWindow.getContentPane().add(rbtnKarta);
+        rodzajPlatnosciWindow.getContentPane().add(btnAccept);
+
+        //Przycisk do potwierdzenia platnosci, zamyka narazie okno
+        //trzeba dodac opcje zeby wyslac na serwer ktora opcje sie zaznaczylo
+        btnAccept.addActionListener(e -> {
+            if(rbtnPrzelew.isSelected()){
+                result[0] = "Przelew";
+            }else if(rbtnGotowka.isSelected()){
+                result[0] = "Gotowka";
+            }else if(rbtnKarta.isSelected()){
+                result[0] =  "Karta";
+                out.println("KARTA");
+
+            }
+            System.out.println(result[0]);
+            ukonczZamowienie();
+            rodzajPlatnosciWindow.dispose();
+
+
+        });
+
+
+        rodzajPlatnosciWindow.setSize(500, 500);
+        rodzajPlatnosciWindow.setLayout(new GridLayout(15,1));
+        rodzajPlatnosciWindow.setVisible(true);
+        rodzajPlatnosciWindow.pack();
+    if (zamowienieGotowe)
+    {
+        return result[0];
+    }
+return null;
+    }
+
+    private void ukonczZamowienie()
+    {
+        zamowienieGotowe = true;
+    }
+}
